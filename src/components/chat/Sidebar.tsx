@@ -45,7 +45,7 @@ export default function Sidebar({ activeChatId, onSelectChat }: SidebarProps) {
     Promise.all(
       Array.from(uidsToFetch).map(async (uid) => {
         const snap = await getDoc(doc(db, "users", uid));
-        if (snap.exists()) return { uid, ...(snap.data() as UserProfile) };
+        if (snap.exists()) return { ...(snap.data() as UserProfile), uid };
         return null;
       })
     ).then((results) => {
