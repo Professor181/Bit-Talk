@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatApp – Project Overview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0B141A; color: #E9EDEF; }
+    .gradient-text { background: linear-gradient(135deg, #25D366, #128C7E); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card { background: #111B21; border: 1px solid #2A3942; }
+    .tag { background: #1F2C33; border: 1px solid #2A3942; color: #8696A0; }
+    .step-badge { background: linear-gradient(135deg, #25D366, #075E54); }
+    .msg-out { background: #005C4B; border-radius: 16px 16px 4px 16px; }
+    .msg-in { background: #1F2C33; border-radius: 16px 16px 16px 4px; }
+    .sidebar { background: #111B21; }
+    .chat-bg { background: #0B141A; }
+    .chat-item:hover { background: #1F2C33; }
+    .chat-item.active { background: #1F2C33; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fadeUp { animation: fadeUp 0.5s ease-out forwards; }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+    .delay-200 { animation-delay: 0.2s; opacity: 0; }
+    .delay-300 { animation-delay: 0.3s; opacity: 0; }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="min-h-screen flex flex-col items-center justify-center px-4 py-20 relative overflow-hidden">
+  <!-- Background decoration -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 -left-32 w-64 h-64 bg-green-900/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-1/4 -right-32 w-96 h-96 bg-teal-900/20 rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="relative max-w-5xl mx-auto text-center">
+    <!-- Logo -->
+    <div class="flex items-center justify-center gap-3 mb-8 animate-fadeUp">
+      <div class="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl" style="background: linear-gradient(135deg, #25D366, #075E54);">
+        <svg viewBox="0 0 24 24" class="w-9 h-9 fill-white">
+          <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.546 20.7a1 1 0 001.282 1.282l3.532-.892A9.96 9.96 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.956 7.956 0 01-4.146-1.163l-.298-.18-2.1.53.53-2.1-.18-.298A7.956 7.956 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
+        </svg>
+      </div>
+      <span class="text-4xl font-bold">ChatApp</span>
+    </div>
+
+    <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fadeUp delay-100 leading-tight">
+      WhatsApp-like Chat,<br>
+      <span class="gradient-text">Ready to Deploy</span>
+    </h1>
+
+    <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10 animate-fadeUp delay-200 leading-relaxed">
+      Full-stack Next.js chat app with Firebase, realtime messaging, Google Sign-In, Gmail OTP, group chats — deploy to Vercel or Netlify in minutes.
+    </p>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-12 animate-fadeUp delay-300">
+      <span class="tag px-3 py-1.5 rounded-full text-sm font-medium">⚡ Next.js 14</span>
+      <span class="tag px-3 py-1.5 rounded-full text-sm font-medium">🔥 Firebase</span>
+      <span class="tag px-3 py-1.5 rounded-full text-sm font-medium">🎨 Tailwind CSS</span>
+      <span class="tag px-3 py-1.5 rounded-full text-sm font-medium">💙 TypeScript</span>
+      <span class="tag px-3 py-1.5 rounded-full text-sm font-medium">📧 Gmail OTP</span>
+      <span class="tag px-3 py-1.5 rounded-full text-sm font-medium">🚀 Vercel/Netlify</span>
+    </div>
+  </div>
+
+  <!-- App preview mockup -->
+  <div class="relative w-full max-w-4xl mx-auto animate-fadeUp delay-300">
+    <div class="card rounded-2xl overflow-hidden shadow-2xl border-2 border-gray-700/50" style="height: 480px; display: flex;">
+      <!-- Sidebar mock -->
+      <div class="sidebar w-80 flex-shrink-0 border-r border-gray-800 flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-4 py-3" style="background:#1F2C33;">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm" style="background:#25D366;">JD</div>
+            <span class="text-sm font-semibold text-gray-200">John Doe</span>
+          </div>
+          <div class="flex gap-1">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background:#2A3942;">
+              <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+          </div>
+        </div>
+        <!-- Search -->
+        <div class="px-3 py-2">
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500" style="background:#1F2C33;">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            Search chats...
+          </div>
+        </div>
+        <!-- Chat list -->
+        <div class="flex-1 overflow-hidden">
+          <!-- Active chat -->
+          <div class="chat-item active flex items-center gap-3 px-4 py-3">
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#4ECDC4;">AS</div>
+              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 bg-green-400" style="border-color:#1F2C33;"></span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-200">Alice Smith</span>
+                <span class="text-xs text-gray-500">2:34 PM</span>
+              </div>
+              <p class="text-xs text-gray-400 truncate">You: Hey! Are you free today?</p>
+            </div>
+          </div>
+          <!-- Group chat -->
+          <div class="chat-item flex items-center gap-3 px-4 py-3">
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#075E54;">TM</div>
+              <span class="absolute -bottom-0.5 -right-0.5 rounded-full p-0.5" style="background:#075E54;">
+                <svg class="w-2 h-2 fill-white" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1z"/></svg>
+              </span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-200">Team Mavericks</span>
+                <span class="text-xs text-gray-500">11:21 AM</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <p class="text-xs text-gray-400 truncate">Bob: Don't forget the standup!</p>
+                <span class="ml-2 text-xs rounded-full w-5 h-5 flex items-center justify-center text-white font-bold flex-shrink-0" style="background:#25D366;">3</span>
+              </div>
+            </div>
+          </div>
+          <!-- Another DM -->
+          <div class="chat-item flex items-center gap-3 px-4 py-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#BB8FCE;">BJ</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-200">Bob Johnson</span>
+                <span class="text-xs text-gray-500">Yesterday</span>
+              </div>
+              <p class="text-xs text-gray-400 truncate">Bob: See you at 3 PM then 👍</p>
+            </div>
+          </div>
+          <!-- Family group -->
+          <div class="chat-item flex items-center gap-3 px-4 py-3">
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#F0B27A;">FG</div>
+              <span class="absolute -bottom-0.5 -right-0.5 rounded-full p-0.5" style="background:#075E54;">
+                <svg class="w-2 h-2 fill-white" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1z"/></svg>
+              </span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-200">Family Group 🏠</span>
+                <span class="text-xs text-gray-500">Mon</span>
+              </div>
+              <p class="text-xs text-gray-400 truncate">You: Coming for dinner Saturday!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat window mock -->
+      <div class="flex-1 flex flex-col chat-bg">
+        <!-- Chat header -->
+        <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-800" style="background:#1F2C33;">
+          <div class="relative">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style="background:#4ECDC4;">AS</div>
+            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 bg-green-400" style="border-color:#1F2C33;"></span>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-200">Alice Smith</p>
+            <p class="text-xs" style="color:#25D366;">online</p>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-1 overflow-hidden px-4 py-4 flex flex-col justify-end gap-2">
+          <!-- Incoming -->
+          <div class="flex items-end gap-2">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:#4ECDC4;">AS</div>
+            <div class="msg-in px-3 py-2 max-w-xs">
+              <p class="text-sm text-gray-200">Hey! How's it going? 😊</p>
+              <p class="text-xs text-gray-500 text-right mt-1">2:30 PM</p>
+            </div>
+          </div>
+          <!-- Outgoing -->
+          <div class="flex items-end justify-end">
+            <div class="msg-out px-3 py-2 max-w-xs">
+              <p class="text-sm text-gray-200">All good! Working on that new project 🚀</p>
+              <div class="flex items-center justify-end gap-1 mt-1">
+                <p class="text-xs text-gray-400">2:31 PM</p>
+                <svg class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 16 11" fill="currentColor"><path d="M11.071.653a.75.75 0 0 1 .205 1.04l-5.5 8a.75.75 0 0 1-1.152.114l-3-3a.75.75 0 0 1 1.06-1.06l2.39 2.39 4.957-7.212a.75.75 0 0 1 1.04-.272z"/><path d="M14.071.653a.75.75 0 0 1 .205 1.04l-5.5 8a.75.75 0 0 1-.1.11.75.75 0 0 1-.048-.166L13.031.925a.75.75 0 0 1 1.04-.272z" opacity=".6"/></svg>
+              </div>
+            </div>
+          </div>
+          <!-- Incoming -->
+          <div class="flex items-end gap-2">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:#4ECDC4;">AS</div>
+            <div class="msg-in px-3 py-2 max-w-xs">
+              <p class="text-sm text-gray-200">Oh nice! Are you free today to chat about it?</p>
+              <p class="text-xs text-gray-500 text-right mt-1">2:33 PM</p>
+            </div>
+          </div>
+          <!-- Outgoing typing -->
+          <div class="flex items-end justify-end">
+            <div class="msg-out px-3 py-2">
+              <p class="text-sm text-gray-200">Hey! Are you free today?</p>
+              <div class="flex items-center justify-end gap-1 mt-1">
+                <p class="text-xs text-gray-400">2:34 PM</p>
+                <svg class="w-3.5 h-3.5 text-gray-500" viewBox="0 0 16 11" fill="currentColor"><path d="M11.071.653a.75.75 0 0 1 .205 1.04l-5.5 8a.75.75 0 0 1-1.152.114l-3-3a.75.75 0 0 1 1.06-1.06l2.39 2.39 4.957-7.212a.75.75 0 0 1 1.04-.272z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="px-4 py-3 border-t border-gray-800" style="background:#1F2C33;">
+          <div class="flex items-center gap-3">
+            <div class="flex-1 px-4 py-2.5 rounded-2xl text-sm text-gray-500 border border-gray-700" style="background:#111B21;">
+              Type a message...
+            </div>
+            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background:#25D366;">
+              <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating labels -->
+    <div class="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+      ✓ Realtime
+    </div>
+  </div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-20 px-4 max-w-6xl mx-auto">
+  <h2 class="text-3xl font-bold text-center mb-3">Everything You Need</h2>
+  <p class="text-gray-400 text-center mb-12">Production-ready features out of the box</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Feature cards -->
+    <div class="card rounded-2xl p-6 hover:border-green-800/50 transition-colors">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-2xl" style="background:#1F2C33;">🔐</div>
+      <h3 class="font-semibold text-lg mb-2">Dual Authentication</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">Google OAuth one-click sign-in <em>and</em> Email OTP via Gmail SMTP. Both work out of the box.</p>
+    </div>
+
+    <div class="card rounded-2xl p-6 hover:border-green-800/50 transition-colors">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-2xl" style="background:#1F2C33;">💬</div>
+      <h3 class="font-semibold text-lg mb-2">1-to-1 Chats</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">Search any registered user by name and start a direct conversation instantly with realtime delivery.</p>
+    </div>
+
+    <div class="card rounded-2xl p-6 hover:border-green-800/50 transition-colors">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-2xl" style="background:#1F2C33;">👥</div>
+      <h3 class="font-semibold text-lg mb-2">Group Chats</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">Create named groups, add/remove members, admin controls, and a leave group option.</p>
+    </div>
+
+    <div class="card rounded-2xl p-6 hover:border-green-800/50 transition-colors">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-2xl" style="background:#1F2C33;">⚡</div>
+      <h3 class="font-semibold text-lg mb-2">Realtime Updates</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">Firestore realtime listeners push new messages instantly. No polling needed — messages appear as they're sent.</p>
+    </div>
+
+    <div class="card rounded-2xl p-6 hover:border-green-800/50 transition-colors">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-2xl" style="background:#1F2C33;">✅</div>
+      <h3 class="font-semibold text-lg mb-2">Read Receipts</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">Double tick indicators show when messages are delivered and read — just like WhatsApp.</p>
+    </div>
+
+    <div class="card rounded-2xl p-6 hover:border-green-800/50 transition-colors">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-2xl" style="background:#1F2C33;">🛡️</div>
+      <h3 class="font-semibold text-lg mb-2">Secure by Default</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">Firestore security rules, OTP rate limiting, server-only env vars, and 10-minute OTP expiry.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Setup Steps -->
+<section class="py-20 px-4 max-w-4xl mx-auto">
+  <h2 class="text-3xl font-bold text-center mb-3">Setup in 4 Steps</h2>
+  <p class="text-gray-400 text-center mb-12">From zero to deployed in ~15 minutes</p>
+
+  <div class="space-y-4">
+    <!-- Step 1 -->
+    <div class="card rounded-2xl p-6 flex gap-5">
+      <div class="step-badge w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0 text-lg">1</div>
+      <div>
+        <h3 class="font-semibold text-lg mb-2">Create a Firebase Project</h3>
+        <p class="text-gray-400 text-sm mb-3">Go to <span class="text-green-400">console.firebase.google.com</span> → New project → Enable Authentication (Google + Email/Password) → Create Firestore database.</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag px-2 py-1 rounded-lg text-xs">5 minutes</span>
+          <span class="tag px-2 py-1 rounded-lg text-xs">Free tier</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card rounded-2xl p-6 flex gap-5">
+      <div class="step-badge w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0 text-lg">2</div>
+      <div>
+        <h3 class="font-semibold text-lg mb-2">Configure Environment Variables</h3>
+        <p class="text-gray-400 text-sm mb-3">Copy <code class="bg-gray-800 px-1.5 py-0.5 rounded text-green-400 text-xs">.env.local.example</code> → <code class="bg-gray-800 px-1.5 py-0.5 rounded text-green-400 text-xs">.env.local</code> and fill in Firebase config + Gmail credentials.</p>
+        <div class="bg-gray-900 rounded-xl p-3 text-xs text-green-400 font-mono overflow-x-auto">
+          <div class="text-gray-500"># Firebase keys</div>
+          <div>NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...</div>
+          <div>NEXT_PUBLIC_FIREBASE_PROJECT_ID=my-app</div>
+          <div class="text-gray-500 mt-2"># Gmail OTP</div>
+          <div>GMAIL_USER=you@gmail.com</div>
+          <div>GMAIL_APP_PASSWORD=abcd efgh ijkl mnop</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 — Gmail OTP highlight -->
+    <div class="card rounded-2xl p-6 flex gap-5 border-yellow-800/40">
+      <div class="step-badge w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0 text-lg">3</div>
+      <div>
+        <h3 class="font-semibold text-lg mb-2 flex items-center gap-2">
+          Get Gmail App Password
+          <span class="text-xs bg-yellow-900/40 border border-yellow-700/40 text-yellow-400 px-2 py-0.5 rounded-full">Important</span>
+        </h3>
+        <p class="text-gray-400 text-sm mb-3">This is needed for Email OTP. It's <strong class="text-white">NOT</strong> your regular Gmail password.</p>
+        <ol class="text-sm text-gray-300 space-y-1.5 ml-4 list-decimal">
+          <li>Go to <span class="text-green-400">myaccount.google.com/security</span></li>
+          <li>Enable <strong>2-Step Verification</strong></li>
+          <li>Search for <strong>"App passwords"</strong></li>
+          <li>Select Mail → Other → type <code class="bg-gray-800 px-1 rounded text-green-400">ChatApp</code> → Generate</li>
+          <li>Copy the <strong>16-character code</strong> → paste in <code class="bg-gray-800 px-1 rounded text-green-400">GMAIL_APP_PASSWORD</code></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="card rounded-2xl p-6 flex gap-5">
+      <div class="step-badge w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0 text-lg">4</div>
+      <div class="w-full">
+        <h3 class="font-semibold text-lg mb-2">Deploy</h3>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-gray-900 rounded-xl p-4">
+            <p class="text-white font-medium mb-2 flex items-center gap-2">
+              <span>▲</span> Vercel (Recommended)
+            </p>
+            <p class="text-gray-400 text-xs mb-2">Push to GitHub → Import on vercel.com → Add env vars → Deploy</p>
+            <div class="bg-gray-800 rounded-lg p-2 text-xs font-mono text-green-400">
+              npx vercel
+            </div>
+          </div>
+          <div class="bg-gray-900 rounded-xl p-4">
+            <p class="text-white font-medium mb-2 flex items-center gap-2">
+              <span>◆</span> Netlify
+            </p>
+            <p class="text-gray-400 text-xs mb-2">Connect repo on netlify.com → netlify.toml auto-detected → Deploy</p>
+            <div class="bg-gray-800 rounded-lg p-2 text-xs font-mono text-green-400">
+              netlify deploy --prod
+            </div>
+          </div>
+        </div>
+        <p class="text-yellow-400 text-xs mt-3">⚠️ After deploy: Add your domain to Firebase → Auth → Authorized domains</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- File Structure -->
+<section class="py-16 px-4 max-w-4xl mx-auto">
+  <h2 class="text-3xl font-bold text-center mb-12">Project Files Generated</h2>
+  <div class="card rounded-2xl p-6 font-mono text-sm overflow-x-auto">
+    <div id="file-tree" class="space-y-0.5 text-gray-300">
+      <div class="text-green-400 font-bold">chatapp/</div>
+      <div class="ml-4 text-blue-400">├── src/</div>
+      <div class="ml-8 text-blue-400">├── app/</div>
+      <div class="ml-12 text-white">├── page.tsx <span class="text-gray-600">← Main chat UI</span></div>
+      <div class="ml-12 text-white">├── layout.tsx <span class="text-gray-600">← Root layout + providers</span></div>
+      <div class="ml-12 text-blue-400">├── login/page.tsx <span class="text-gray-600">← Google + OTP login</span></div>
+      <div class="ml-12 text-blue-400">└── api/otp/</div>
+      <div class="ml-16 text-yellow-400">├── send/route.ts <span class="text-gray-600">← Serverless: send OTP email</span></div>
+      <div class="ml-16 text-yellow-400">└── verify/route.ts <span class="text-gray-600">← Serverless: verify OTP</span></div>
+      <div class="ml-8 text-blue-400">├── components/chat/</div>
+      <div class="ml-12 text-white">├── Sidebar.tsx <span class="text-gray-600">← Chat list</span></div>
+      <div class="ml-12 text-white">├── ChatWindow.tsx <span class="text-gray-600">← Message view</span></div>
+      <div class="ml-12 text-white">├── MessageBubble.tsx</div>
+      <div class="ml-12 text-white">├── ChatListItem.tsx</div>
+      <div class="ml-12 text-white">├── Avatar.tsx</div>
+      <div class="ml-12 text-white">├── NewChatModal.tsx</div>
+      <div class="ml-12 text-white">├── CreateGroupModal.tsx</div>
+      <div class="ml-12 text-white">└── GroupInfoModal.tsx</div>
+      <div class="ml-8 text-blue-400">├── context/AuthContext.tsx</div>
+      <div class="ml-8 text-blue-400">├── hooks/useChats.ts</div>
+      <div class="ml-8 text-blue-400">├── hooks/useMessages.ts</div>
+      <div class="ml-8 text-blue-400">└── lib/</div>
+      <div class="ml-12 text-white">├── firebase.ts</div>
+      <div class="ml-12 text-white">└── firestore.ts</div>
+      <div class="ml-4 text-green-400">├── firestore.rules <span class="text-gray-600">← Security rules</span></div>
+      <div class="ml-4 text-green-400">├── firestore.indexes.json</div>
+      <div class="ml-4 text-green-400">├── vercel.json</div>
+      <div class="ml-4 text-green-400">├── netlify.toml</div>
+      <div class="ml-4 text-yellow-400">├── .env.local.example <span class="text-gray-600">← ⚠️ Copy this!</span></div>
+      <div class="ml-4 text-gray-400">├── package.json</div>
+      <div class="ml-4 text-gray-400">├── next.config.js</div>
+      <div class="ml-4 text-gray-400">├── tailwind.config.ts</div>
+      <div class="ml-4 text-gray-400">└── tsconfig.json</div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech stack -->
+<section class="py-16 px-4 max-w-4xl mx-auto">
+  <h2 class="text-3xl font-bold text-center mb-12">Tech Stack</h2>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="card rounded-2xl p-5 text-center">
+      <div class="text-4xl mb-3">⚡</div>
+      <p class="font-semibold">Next.js 14</p>
+      <p class="text-gray-500 text-xs mt-1">App Router + API Routes</p>
+    </div>
+    <div class="card rounded-2xl p-5 text-center">
+      <div class="text-4xl mb-3">🔥</div>
+      <p class="font-semibold">Firebase</p>
+      <p class="text-gray-500 text-xs mt-1">Auth + Firestore</p>
+    </div>
+    <div class="card rounded-2xl p-5 text-center">
+      <div class="text-4xl mb-3">💅</div>
+      <p class="font-semibold">Tailwind CSS</p>
+      <p class="text-gray-500 text-xs mt-1">WhatsApp Dark UI</p>
+    </div>
+    <div class="card rounded-2xl p-5 text-center">
+      <div class="text-4xl mb-3">📧</div>
+      <p class="font-semibold">Nodemailer</p>
+      <p class="text-gray-500 text-xs mt-1">Gmail SMTP OTP</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="text-center py-12 px-4 text-gray-600 border-t border-gray-800">
+  <p>ChatApp — Production-ready Next.js + Firebase Chat</p>
+  <p class="text-xs mt-2">See <code class="text-green-700">README.md</code> for full setup guide</p>
+</footer>
+
+</body>
+</html>
