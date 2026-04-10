@@ -1,5 +1,5 @@
 "use client";
-
+import ContactProfileModal from "./ContactProfileModal";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
@@ -30,6 +30,7 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
   const [messageText, setMessageText] = useState("");
   const [sending, setSending] = useState(false);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const [showContactProfile, setShowContactProfile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -139,7 +140,13 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
 
         <button
           className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-90 transition-opacity"
-          onClick={() => chat.type === "group" && setShowGroupInfo(true)}
+          onClick={() => {
+            if (chat.type === "group") {
+              setShowGroupInfo(true);
+            } else if (chat.type === "direct") {
+              setShowContactProfile(true);
+            }
+          }}
         >
           <Avatar
             name={chatName}
@@ -255,11 +262,19 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
         </p>
       </div>
 
-      {/* Group Info Modal */}
+      {/* Modals */}
       {showGroupInfo && chat.type === "group" && (
         <GroupInfoModal
           chat={chat}
           onClose={() => setShowGroupInfo(false)}
+        />
+      )}
+      
+      {/* NEW: Contact Profile Modal */}
+      {showContactProfile && chat.type === "direct" && otherUser && (
+        <ContactProfileModal
+          contact={otherUser}
+          onClose={() => setShowContactProfile(false)}
         />
       )}
     </div>
