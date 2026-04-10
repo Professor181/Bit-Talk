@@ -10,6 +10,7 @@ import ChatListItem from "./ChatListItem";
 import NewChatModal from "./NewChatModal";
 import CreateGroupModal from "./CreateGroupModal";
 import Avatar from "./Avatar";
+import ProfileSettings from "./ProfileSettings";
 import toast from "react-hot-toast";
 
 interface SidebarProps {
@@ -25,6 +26,7 @@ export default function Sidebar({ activeChatId, onSelectChat }: SidebarProps) {
   const [showNewChat, setShowNewChat] = useState(false);
   const [showNewGroup, setShowNewGroup] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   // Fetch other user profiles for direct chats
   useEffect(() => {
@@ -81,11 +83,18 @@ export default function Sidebar({ activeChatId, onSelectChat }: SidebarProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-brand-sidebarHover">
         <div className="flex items-center gap-3">
-          <Avatar
-            name={user?.displayName || user?.email || "Me"}
-            photoURL={user?.photoURL || undefined}
-            size="md"
-          />
+          {/* Clickable Avatar Wrapper */}
+          <div 
+            onClick={() => setShowProfile(true)}
+            className="cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-brand-green rounded-full"
+            title="Profile Settings"
+          >
+            <Avatar
+              name={user?.displayName || user?.email || "Me"}
+              photoURL={user?.photoURL || undefined}
+              size="md"
+            />
+          </div>
           <span className="font-semibold text-brand-text text-sm truncate max-w-[120px]">
             {user?.displayName || user?.email?.split("@")[0]}
           </span>
@@ -224,6 +233,9 @@ export default function Sidebar({ activeChatId, onSelectChat }: SidebarProps) {
           onClose={() => setShowNewGroup(false)}
           onGroupCreated={(id) => onSelectChat(id)}
         />
+      )}
+      {showProfile && (
+        <ProfileSettings onClose={() => setShowProfile(false)} />
       )}
     </div>
   );
