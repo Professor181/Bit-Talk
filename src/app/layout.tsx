@@ -34,9 +34,3 @@ export default function RootLayout({
   );
 }
 
-
-git add .
-git commit -m "Initial commit - app is working"
-git branch -M main
-git remote add origin https://github.com/Professor181/Bit-Talk.git
-git push -u origin main
