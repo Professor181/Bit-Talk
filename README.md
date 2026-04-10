@@ -370,4 +370,4 @@ After deployment, add your production URL to Firebase:
 
 ---
 
-*Built with ❤️ using Next.js + Firebase*
+*Built using Next.js + Firebase*
