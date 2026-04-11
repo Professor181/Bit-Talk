@@ -9,7 +9,7 @@ export default function EmojiPickerWrapper({ onEmojiClick }: Props) {
   return (
     <EmojiPicker 
       onEmojiClick={onEmojiClick}
-      theme={Theme.DARK}  {/* <-- Using the official Theme object here! */}
+      theme={Theme.DARK}
       lazyLoadEmojis={true}
     />
   );
