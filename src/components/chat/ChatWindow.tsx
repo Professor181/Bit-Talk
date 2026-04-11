@@ -312,8 +312,6 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
           <div className="absolute bottom-full left-4 mb-2 z-50 shadow-2xl rounded-lg overflow-hidden border border-brand-sidebarBorder">
             <EmojiPicker 
               onEmojiClick={onEmojiClick}
-              theme="dark"
-              lazyLoadEmojis={true}
             />
           </div>
         )}
