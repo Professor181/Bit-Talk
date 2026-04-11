@@ -7,15 +7,18 @@ import {
   Chat,
   UserProfile,
   sendMessage,
-  subscribeToMessages,
   Message,
+  deleteMessages,
 } from "@/lib/firestore";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import MessageBubble from "./MessageBubble";
 import Avatar from "./Avatar";
 import GroupInfoModal from "./GroupInfoModal";
 import toast from "react-hot-toast";
+import dynamic from "next/dynamic";
+
+const EmojiPicker = dynamic(() => import("./EmojiPickerWrapper"), { ssr: false });
 
 interface ChatWindowProps {
   chatId: string;
@@ -31,8 +34,13 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
   const [sending, setSending] = useState(false);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [showContactProfile, setShowContactProfile] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Selection State
+  const [selectedMessageIds, setSelectedMessageIds] = useState<string[]>([]);
+  const isSelectionMode = selectedMessageIds.length > 0;
 
   // Subscribe to chat metadata
   useEffect(() => {
@@ -72,12 +80,45 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
     e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
   };
 
+  const handleToggleSelect = (messageId: string) => {
+    setSelectedMessageIds((prev) => 
+      prev.includes(messageId) 
+        ? prev.filter((id) => id !== messageId) 
+        : [...prev, messageId]
+    );
+  };
+
+  const handleDeleteSelected = async () => {
+    if (!confirm(`Delete ${selectedMessageIds.length} message(s)?`)) return;
+    
+    try {
+      await deleteMessages(chatId, selectedMessageIds);
+      setSelectedMessageIds([]); // Exit selection mode
+      toast.success("Messages deleted");
+    } catch (error) {
+      toast.error("Failed to delete messages");
+    }
+  };
+
+  const handleCopySelected = () => {
+    // Finds the text of all selected messages and copies them to clipboard
+    const textsToCopy = messages
+      .filter(m => selectedMessageIds.includes(m.id!))
+      .map(m => m.text)
+      .join("\n\n");
+      
+    navigator.clipboard.writeText(textsToCopy);
+    setSelectedMessageIds([]);
+    toast.success("Copied to clipboard");
+  };
+
   const handleSend = async () => {
     const text = messageText.trim();
     if (!text || !user || sending) return;
 
     setSending(true);
     setMessageText("");
+    setShowEmojiPicker(false); // Close emoji picker on send
     if (inputRef.current) {
       inputRef.current.style.height = "auto";
     }
@@ -104,6 +145,11 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
     }
   };
 
+  // Handle Emoji Click
+  const onEmojiClick = (emojiObject: { emoji: string }) => {
+    setMessageText((prevText) => prevText + emojiObject.emoji);
+  };
+
   // Chat name / display info
   const chatName = chat?.type === "group"
     ? chat.name || "Group Chat"
@@ -127,60 +173,92 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
 
   return (
     <div className="flex flex-col h-full bg-brand-chatBg">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-brand-sidebarHover border-b border-brand-sidebarBorder">
-        {/* Back button (mobile) */}
-        {onBack && (
-          <button onClick={onBack} className="text-brand-subtext hover:text-brand-text p-1 mr-1 flex-shrink-0">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-        )}
-
-        <button
-          className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-90 transition-opacity"
-          onClick={() => {
-            if (chat.type === "group") {
-              setShowGroupInfo(true);
-            } else if (chat.type === "direct") {
-              setShowContactProfile(true);
-            }
-          }}
-        >
-          <Avatar
-            name={chatName}
-            photoURL={chatPhoto}
-            size="md"
-            online={chat.type === "direct" ? otherUser?.online : undefined}
-          />
-          <div className="min-w-0">
-            <p className="text-brand-text font-semibold text-sm truncate">{chatName}</p>
-            <p className={`text-xs truncate ${
-              chat.type === "direct" && otherUser?.online
-                ? "text-brand-green"
-                : "text-brand-subtext"
-            }`}>
-              {chatSubtitle}
-            </p>
+      
+      {/* ── HEADER AREA ── */}
+      {isSelectionMode ? (
+        <div className="flex items-center justify-between px-4 py-3 bg-[#111B21] border-b border-brand-sidebarBorder h-[65px] transition-all">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSelectedMessageIds([])} className="text-brand-subtext hover:text-white transition-colors">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <span className="text-white font-medium">{selectedMessageIds.length} selected</span>
           </div>
-        </button>
-
-        {/* Actions */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {chat.type === "group" && (
-            <button
-              onClick={() => setShowGroupInfo(true)}
-              className="p-2 rounded-full text-brand-subtext hover:text-brand-text hover:bg-brand-sidebarBorder transition-colors"
-              title="Group info"
-            >
+          
+          <div className="flex items-center gap-5 text-brand-subtext">
+            <button onClick={handleCopySelected} className="hover:text-white transition-colors" title="Copy">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+            <button className="hover:text-white transition-colors" title="Forward">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
+            </button>
+            <button onClick={handleDeleteSelected} className="hover:text-red-500 transition-colors" title="Delete">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 px-4 py-3 bg-brand-sidebarHover border-b border-brand-sidebarBorder h-[65px] transition-all">
+          {/* Back button (mobile) */}
+          {onBack && (
+            <button onClick={onBack} className="text-brand-subtext hover:text-brand-text p-1 mr-1 flex-shrink-0">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
           )}
+
+          <button
+            className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-90 transition-opacity"
+            onClick={() => {
+              if (chat.type === "group") {
+                setShowGroupInfo(true);
+              } else if (chat.type === "direct") {
+                setShowContactProfile(true);
+              }
+            }}
+          >
+            <Avatar
+              name={chatName}
+              photoURL={chatPhoto}
+              size="md"
+              online={chat.type === "direct" ? otherUser?.online : undefined}
+            />
+            <div className="min-w-0">
+              <p className="text-brand-text font-semibold text-sm truncate">{chatName}</p>
+              <p className={`text-xs truncate ${
+                chat.type === "direct" && otherUser?.online
+                  ? "text-brand-green"
+                  : "text-brand-subtext"
+              }`}>
+                {chatSubtitle}
+              </p>
+            </div>
+          </button>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {chat.type === "group" && (
+              <button
+                onClick={() => setShowGroupInfo(true)}
+                className="p-2 rounded-full text-brand-subtext hover:text-brand-text hover:bg-brand-sidebarBorder transition-colors"
+                title="Group info"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Messages area */}
       <div
@@ -215,6 +293,10 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
               message={msg}
               showAvatar={showAvatar}
               isGroup={chat.type === "group"}
+              // NEW: Passing down the selection props
+              isSelected={selectedMessageIds.includes(msg.id!)}
+              selectionMode={isSelectionMode}
+              onToggleSelect={handleToggleSelect}
             />
           );
         })}
@@ -222,9 +304,32 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message input */}
-      <div className="px-4 py-3 bg-brand-sidebarHover border-t border-brand-sidebarBorder">
+      {/* Message input area with relative positioning */}
+      <div className="relative px-4 py-3 bg-brand-sidebarHover border-t border-brand-sidebarBorder">
+        
+        {/* Emoji Picker Popup */}
+        {showEmojiPicker && (
+          <div className="absolute bottom-full left-4 mb-2 z-50 shadow-2xl rounded-lg overflow-hidden border border-brand-sidebarBorder">
+            <EmojiPicker 
+              onEmojiClick={onEmojiClick}
+              theme="dark"
+              lazyLoadEmojis={true}
+            />
+          </div>
+        )}
+
         <div className="flex items-end gap-3">
+          {/* Smiley Toggle Button */}
+          <button
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+            className="flex-shrink-0 p-2 text-brand-subtext hover:text-brand-text transition-colors"
+            title="Add Emoji"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+
           <div className="flex-1 bg-brand-sidebar rounded-2xl border border-brand-sidebarBorder focus-within:border-brand-green transition-colors">
             <textarea
               ref={inputRef}
@@ -256,7 +361,7 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
             )}
           </button>
         </div>
-        <p className="text-xs text-brand-subtext mt-1.5 px-1">
+        <p className="text-xs text-brand-subtext mt-1.5 px-1 ml-12">
           Press <kbd className="px-1 py-0.5 bg-brand-sidebarBorder rounded text-[10px]">Enter</kbd> to send,{" "}
           <kbd className="px-1 py-0.5 bg-brand-sidebarBorder rounded text-[10px]">Shift+Enter</kbd> for new line
         </p>
@@ -270,7 +375,6 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
         />
       )}
       
-      {/* NEW: Contact Profile Modal */}
       {showContactProfile && chat.type === "direct" && otherUser && (
         <ContactProfileModal
           contact={otherUser}

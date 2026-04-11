@@ -26,6 +26,7 @@ import {
   arrayRemove,
   limit,
   writeBatch,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -284,3 +285,16 @@ export function subscribeToMessages(
     callback(messages);
   });
 }
+
+// Hard delete multiple messages at once
+export const deleteMessages = async (chatId: string, messageIds: string[]) => {
+  try {
+    const promises = messageIds.map((id) =>
+      deleteDoc(doc(db, `chats/${chatId}/messages/${id}`))
+    );
+    await Promise.all(promises); // Executes all deletes simultaneously 
+  } catch (error) {
+    console.error("Error deleting messages:", error);
+    throw error;
+  }
+};
