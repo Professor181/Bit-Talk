@@ -40,6 +40,7 @@ export interface UserProfile {
   createdAt: Timestamp;
   lastSeen: Timestamp;
   online: boolean;
+  about?: string;
 }
 
 export interface Chat {
